@@ -2,11 +2,16 @@ package com.example.smartsmile;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import android.Manifest;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -63,14 +68,29 @@ public class DetectionScanFragment extends Fragment {
         return fragment;
     }
 
+    private ActivityResultLauncher<Intent> cameraLauncher;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        // 🟢 Initialize cameraLauncher in onCreate()
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        if (imageUri != null) {
+                            navigateToPreviewFragment(imageUri);
+                        } else {
+                            Log.e("DetectionScanFragment", "Image URI is null after capture!");
+                        }
+                    } else {
+                        Log.e("DetectionScanFragment", "Failed to capture image");
+                    }
+                }
+        );
     }
+
+    private Uri imageUri; // Store the image URI
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,9 +106,7 @@ public class DetectionScanFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
-                        Uri imageUri = result.getData().getData();
-                        Log.d("DetectionScanFragment", "Gallery Image Selected: " + imageUri);
-
+                        imageUri = result.getData().getData();
                         if (imageUri != null) {
                             navigateToPreviewFragment(imageUri);
                         }
@@ -108,9 +126,6 @@ public class DetectionScanFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
-                        Uri imageUri = result.getData().getData();
-                        Log.d("DetectionScanFragment", "Camera Image Captured: " + imageUri);
-
                         if (imageUri != null) {
                             navigateToPreviewFragment(imageUri);
                         }
@@ -121,26 +136,63 @@ public class DetectionScanFragment extends Fragment {
         );
 
         buttonCapture.setOnClickListener(v -> {
-            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            // Ensure a camera app is available
-            if (cameraIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-                try {
-                    File photoFile = createImageFile();
-                    if (photoFile != null) {
-                        Uri imageUri = FileProvider.getUriForFile(requireContext(),
-                                "com.example.smartsmile.fileprovider", photoFile);
-                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-                        cameraLauncher.launch(cameraIntent);
-                    }
-                } catch (IOException e) {
-                    Log.e("DetectionScanFragment", "Error creating image file");
-                }
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, 1002);
             } else {
-                Log.e("DetectionScanFragment", "No camera app available!");
+                openCamera();
             }
         });
 
+
         return view;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1002) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else {
+                Log.e("DetectionScanFragment", "Camera permission denied!");
+            }
+        }
+    }
+
+    private void openCamera() {
+        try {
+            File photoFile = createImageFile();
+            if (photoFile != null) {
+                // 🔥 UPDATE GLOBAL imageUri
+                imageUri = FileProvider.getUriForFile(requireContext(),
+                        "com.example.smartsmile.fileprovider", photoFile);
+
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+                // 🔥 USE cameraLauncher.launch()
+                cameraLauncher.launch(cameraIntent);
+            }
+        } catch (IOException e) {
+            Log.e("DetectionScanFragment", "Error creating image file", e);
+        }
+    }
+
+
+    // Create a file for storing the captured image
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG_" + timeStamp + ".jpg";
+        File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        // Ensure the directory exists
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+
+        File imageFile = new File(storageDir, imageFileName);
+        return imageFile;
     }
 
     // Navigate to DetectionPreviewFragment with selected image
@@ -150,9 +202,6 @@ public class DetectionScanFragment extends Fragment {
             Log.e("DetectionScanFragment", "Image URI is null!");
             return;
         }
-
-
-        Log.d("DetectionScanFragment", "Navigating to preview with image: " + imageUri.toString());
 
         Bundle bundle = new Bundle();
         bundle.putParcelable("imageUri", imageUri);
@@ -165,13 +214,4 @@ public class DetectionScanFragment extends Fragment {
         transaction.addToBackStack(null);
         transaction.commit();
     }
-
-    // Create a file for storing the captured image
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(imageFileName, ".jpg", storageDir);
-    }
-
 }
