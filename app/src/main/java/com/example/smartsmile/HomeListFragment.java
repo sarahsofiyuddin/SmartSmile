@@ -3,10 +3,16 @@ package com.example.smartsmile;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,10 +61,55 @@ public class HomeListFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_home_list, container, false);
+
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewDiseaseSlider);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        List<DentalDisease> diseaseList = new ArrayList<>();
+        diseaseList.add(new DentalDisease("Dental Caries", R.drawable.home_icon, "DentalCariesFragment"));
+        diseaseList.add(new DentalDisease("Gingivitis", R.drawable.email_icon, "GingivitisFragment"));
+        diseaseList.add(new DentalDisease("Dental Calculus", R.drawable.history_icon, "DentalCalculusFragment"));
+        diseaseList.add(new DentalDisease("Hypodontia", R.drawable.password_icon, "HypodontiaFragment"));
+
+        DiseaseSliderAdapter adapter = new DiseaseSliderAdapter(diseaseList, this::openDiseaseFragment);
+        recyclerView.setAdapter(adapter);
+
+        return view;
+
     }
+
+    private void openDiseaseFragment(DentalDisease disease) {
+        Fragment fragment;
+
+        switch (disease.getFragmentTag()) {
+            case "DentalCariesFragment":
+                fragment = new DentalCariesFragment();
+                break;
+            case "GingivitisFragment":
+                fragment = new GingivitisFragment();
+                break;
+            case "DentalCalculusFragment":
+                fragment = new DentalCalculusFragment();
+                break;
+            case "HypodontiaFragment":
+                fragment = new HypodontiaFragment();
+                break;
+            default:
+                return;
+        }
+
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.frameLayout_home, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 }
