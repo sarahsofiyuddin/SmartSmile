@@ -1,20 +1,21 @@
 package com.example.smartsmile;
 
+import java.util.List;
+
 public class DentalDisease {
     private String name;
-    private int imageResId;
-    private String fragmentTag;
+    private List<Integer> imageList; // Store image resource IDs
 
-    public DentalDisease(String name, int imageResId, String fragmentTag) {
+    public DentalDisease(String name, List<Integer> imageList) {
         this.name = name;
-        this.imageResId = imageResId;
-        this.fragmentTag = fragmentTag;
+        this.imageList = imageList;
     }
 
     public String getName() {
-        return name; }
-    public int getImageResId() {
-        return imageResId; }
-    public String getFragmentTag() {
-        return fragmentTag; }
+        return name;
+    }
+
+    public List<Integer> getImageList() {
+        return imageList;
+    }
 }

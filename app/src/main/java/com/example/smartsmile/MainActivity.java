@@ -29,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        FrameLayout frameLayout = findViewById(R.id.frameLayout);
 
         // Set default fragment to DetectionFragment
         if (savedInstanceState == null) {

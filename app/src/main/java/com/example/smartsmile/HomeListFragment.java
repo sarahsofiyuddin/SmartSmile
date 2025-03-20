@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -70,46 +71,18 @@ public class HomeListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_list, container, false);
 
-        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewDiseaseSlider);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        List<DentalDisease> diseaseList = new ArrayList<>();
-        diseaseList.add(new DentalDisease("Dental Caries", R.drawable.home_icon, "DentalCariesFragment"));
-        diseaseList.add(new DentalDisease("Gingivitis", R.drawable.email_icon, "GingivitisFragment"));
-        diseaseList.add(new DentalDisease("Dental Calculus", R.drawable.history_icon, "DentalCalculusFragment"));
-        diseaseList.add(new DentalDisease("Hypodontia", R.drawable.password_icon, "HypodontiaFragment"));
+        List<DentalDisease> diseaseList = Arrays.asList(
+                new DentalDisease("Dental Caries", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon)),
+                new DentalDisease("Dental Calculus", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon)),
+                new DentalDisease("Gingivitis", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon)),
+                new DentalDisease("Hypodontia", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon))
+        );
 
-        DiseaseSliderAdapter adapter = new DiseaseSliderAdapter(diseaseList, this::openDiseaseFragment);
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(new DiseaseAdapter(diseaseList, this));
 
         return view;
-
     }
-
-    private void openDiseaseFragment(DentalDisease disease) {
-        Fragment fragment;
-
-        switch (disease.getFragmentTag()) {
-            case "DentalCariesFragment":
-                fragment = new DentalCariesFragment();
-                break;
-            case "GingivitisFragment":
-                fragment = new GingivitisFragment();
-                break;
-            case "DentalCalculusFragment":
-                fragment = new DentalCalculusFragment();
-                break;
-            case "HypodontiaFragment":
-                fragment = new HypodontiaFragment();
-                break;
-            default:
-                return;
-        }
-
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.frameLayout_home, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
 }

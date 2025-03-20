@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
 
     <FrameLayout
         android:id="@+id/frameLayout_home"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
+    <!-- Welcome Text -->
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome Name!"
+        android:textSize="22sp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dental diseases information and dental care tips."
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:paddingBottom="16dp"/>
+
+    <!-- RecyclerView for Diseases -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_diseases"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
