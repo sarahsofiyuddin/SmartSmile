@@ -35,7 +35,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/login_email"
+                android:id="@+id/editText_email"
                 android:background="@drawable/signuplogin_edittext"
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
@@ -45,18 +45,35 @@
                 android:drawablePadding="10dp"
                 android:textColor="@color/black"/>
 
-            <EditText
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:id="@+id/login_password"
-                android:background="@drawable/signuplogin_edittext"
-                android:layout_marginTop="20dp"
-                android:padding="10dp"
-                android:hint="Password"
-                android:textColorHint="@color/black"
-                android:drawableLeft="@drawable/password_icon"
-                android:drawablePadding="10dp"
-                android:textColor="@color/black"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <EditText
+                    android:id="@+id/editText_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/signuplogin_edittext"
+                    android:padding="10dp"
+                    android:hint="Password"
+                    android:textColorHint="@color/black"
+                    android:drawableLeft="@drawable/password_icon"
+                    android:drawablePadding="10dp"
+                    android:textColor="@color/black"
+                    android:inputType="textPassword" />
+
+                <!-- Eye Icon for Password Visibility Toggle -->
+                <ImageView
+                    android:id="@+id/eye_icon"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    app:tint="@color/black"
+                    android:layout_alignParentEnd="true"
+                    android:paddingEnd="10dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/eye_off_icon" />
+            </RelativeLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -73,7 +90,7 @@
                 android:layout_height="60dp"
                 android:text="Sign In"
                 android:textColor="@color/black"
-                android:id="@+id/signin_button"
+                android:id="@+id/button_signin"
                 android:textSize="18sp"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="@color/primary_blue"

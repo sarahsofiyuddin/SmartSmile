@@ -35,7 +35,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/login_name"
+                android:id="@+id/editText_name"
                 android:background="@drawable/signuplogin_edittext"
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
@@ -48,7 +48,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/signup_email"
+                android:id="@+id/editText_email"
                 android:background="@drawable/signuplogin_edittext"
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
@@ -61,7 +61,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/singup_password"
+                android:id="@+id/editText_password"
                 android:background="@drawable/signuplogin_edittext"
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
@@ -74,7 +74,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:id="@+id/signup_confirmpassword"
+                android:id="@+id/editText_confirmPassword"
                 android:background="@drawable/signuplogin_edittext"
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
@@ -87,9 +87,9 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
+                android:id="@+id/button_signUp"
                 android:text="Sign Up"
                 android:textColor="@color/black"
-                android:id="@+id/signup_button"
                 android:textSize="18sp"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/primary_blue"

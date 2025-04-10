@@ -6,16 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/white"
     tools:context=".MainActivity">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/topNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/top_nav_menu"
-        android:background="@color/secondary_blue"
-        app:titleTextColor="@color/primary_blue"
-        app:subtitleTextColor="@color/primary_blue"/>
 
     <FrameLayout
         android:id="@+id/frameLayout"
