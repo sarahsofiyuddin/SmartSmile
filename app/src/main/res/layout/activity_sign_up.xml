@@ -40,7 +40,6 @@
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
                 android:hint="Name"
-                android:textColorHint="@color/black"
                 android:drawableLeft="@drawable/profile_icon"
                 android:drawablePadding="10dp"
                 android:textColor="@color/black"/>
@@ -53,41 +52,72 @@
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
                 android:hint="Email"
-                android:textColorHint="@color/black"
                 android:drawableLeft="@drawable/email_icon"
                 android:drawablePadding="10dp"
                 android:textColor="@color/black"/>
 
-            <EditText
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:id="@+id/editText_password"
-                android:background="@drawable/signuplogin_edittext"
-                android:layout_marginTop="20dp"
-                android:padding="10dp"
-                android:hint="Password"
-                android:textColorHint="@color/black"
-                android:drawableLeft="@drawable/password_icon"
-                android:drawablePadding="10dp"
-                android:textColor="@color/black"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
 
-            <EditText
+                <EditText
+                    android:id="@+id/editText_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/signuplogin_edittext"
+                    android:padding="10dp"
+                    android:hint="Password"
+                    android:drawableLeft="@drawable/password_icon"
+                    android:drawablePadding="10dp"
+                    android:textColor="@color/black"
+                    android:inputType="textPassword" />
+
+                <!-- Eye Icon for Password Visibility Toggle -->
+                <ImageView
+                    android:id="@+id/eye_icon_password"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    app:tint="@color/black"
+                    android:layout_alignParentEnd="true"
+                    android:paddingEnd="10dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/eye_off_icon" />
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:id="@+id/editText_confirmPassword"
-                android:background="@drawable/signuplogin_edittext"
-                android:layout_marginTop="20dp"
-                android:padding="10dp"
-                android:hint="Confirm Password"
-                android:textColorHint="@color/black"
-                android:drawableLeft="@drawable/password_icon"
-                android:drawablePadding="10dp"
-                android:textColor="@color/black"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <EditText
+                    android:id="@+id/editText_confirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/signuplogin_edittext"
+                    android:padding="10dp"
+                    android:hint="Confirm Password"
+                    android:drawableLeft="@drawable/password_icon"
+                    android:drawablePadding="10dp"
+                    android:textColor="@color/black"
+                    android:inputType="textPassword" />
+
+                <!-- Eye Icon for Password Visibility Toggle -->
+                <ImageView
+                    android:id="@+id/eye_icon_confirm_password"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    app:tint="@color/black"
+                    android:layout_alignParentEnd="true"
+                    android:paddingEnd="10dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/eye_off_icon" />
+            </RelativeLayout>
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:id="@+id/button_signUp"
+                android:id="@+id/buttonSignUp"
                 android:text="Sign Up"
                 android:textColor="@color/black"
                 android:textSize="18sp"
@@ -98,8 +128,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/signup_redirecttext"
-                android:text="Already have an account? Sign In"
+                android:id="@+id/signUp_redirecttext"
+                android:text=""
                 android:layout_gravity="center"
                 android:padding="10dp"
                 android:textColor="@color/black"
@@ -127,7 +157,7 @@
                     android:layout_height="60dp"
                     android:text="Google"
                     android:textColor="@color/black"
-                    android:id="@+id/signup_google"
+                    android:id="@+id/google_signUp"
                     android:drawableLeft="@drawable/phone_icon"
                     android:textSize="18sp"
                     android:layout_weight="1"

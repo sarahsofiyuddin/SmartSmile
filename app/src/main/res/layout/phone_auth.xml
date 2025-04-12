@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign In with Phone Number"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:id="@+id/editTextPhone"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Phone Number"
+        android:background="@drawable/signuplogin_edittext"
+        android:padding="10dp"
+        android:drawableLeft="@drawable/phone_icon"
+        android:drawablePadding="10dp"
+        android:layout_marginTop="16dp"
+        android:inputType="phone"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/buttonSendOTP"
+        android:text="Send OTP"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/primary_pink"
+        app:cornerRadius = "20dp" />
+
+    <EditText
+        android:id="@+id/editTextOTP"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Enter OTP"
+        android:background="@drawable/signuplogin_edittext"
+        android:padding="10dp"
+        android:drawableLeft="@drawable/phone_icon"
+        android:drawablePadding="10dp"
+        android:layout_marginTop="16dp"
+        android:inputType="number" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/buttonVerifyOTP"
+        android:text="Verify OTP"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/primary_pink"
+        app:cornerRadius = "20dp"/>
+</LinearLayout>

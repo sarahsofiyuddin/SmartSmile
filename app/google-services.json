@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "290471382252",
+    "firebase_url": "https://ss-smartsmile-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "ss-smartsmile",
+    "storage_bucket": "ss-smartsmile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290471382252:android:e89b37b009ee686b5b29c9",
+        "android_client_info": {
+          "package_name": "com.example.smartsmile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "290471382252-m14osjm8fbi0ajda0pthcm43rfbfoebp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smartsmile",
+            "certificate_hash": "b8dcda8fcb13cd903e0dd5c0891a4a2f5946889f"
+          }
+        },
+        {
+          "client_id": "290471382252-5ap58s3anc50dcigncgtle27et8mr61d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxV0SLLMS1TYwOnyWn_M7VjNIHFedHrdM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "290471382252-5ap58s3anc50dcigncgtle27et8mr61d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -40,7 +40,6 @@
                 android:layout_marginTop="20dp"
                 android:padding="10dp"
                 android:hint="Email"
-                android:textColorHint="@color/black"
                 android:drawableLeft="@drawable/email_icon"
                 android:drawablePadding="10dp"
                 android:textColor="@color/black"/>
@@ -57,7 +56,6 @@
                     android:background="@drawable/signuplogin_edittext"
                     android:padding="10dp"
                     android:hint="Password"
-                    android:textColorHint="@color/black"
                     android:drawableLeft="@drawable/password_icon"
                     android:drawablePadding="10dp"
                     android:textColor="@color/black"
@@ -99,8 +97,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/login_redirecttext"
-                android:text="Not yet registered? Sign Up"
+                android:id="@+id/signIn_redirecttext"
+                android:text=""
                 android:layout_gravity="center"
                 android:padding="10dp"
                 android:textColor="@color/black"
@@ -126,9 +124,9 @@
                 <Button
                     android:layout_width="0dp"
                     android:layout_height="60dp"
+                    android:id="@+id/google_signIn"
                     android:text="Google"
                     android:textColor="@color/black"
-                    android:id="@+id/signup_google"
                     android:drawableLeft="@drawable/phone_icon"
                     android:textSize="18sp"
                     android:layout_weight="1"

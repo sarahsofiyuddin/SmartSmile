@@ -10,4 +10,11 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="RoundedDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_background</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowMinWidthMajor">90%</item> <!-- Optional: width -->
+        <item name="android:windowMinWidthMinor">90%</item>
+    </style>
+
 </resources>
