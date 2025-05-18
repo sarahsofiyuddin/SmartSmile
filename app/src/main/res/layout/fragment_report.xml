@@ -1,17 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ReportFragment">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:id="@+id/textViewGreeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="50dp"
+        android:text="Hello Name!"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:textSize="16sp"
-        android:text="Report Fragment" />
+        android:textColor="@color/black"
+        android:layout_marginBottom="20dp" />
 
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondary_blue"
+        android:stretchColumns="*"
+        android:padding="10dp">
 
-</FrameLayout>
+        <TableRow>
+            <TextView
+                android:text="Date"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:padding="8dp" />
+            <TextView
+                android:text="Image"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:padding="8dp" />
+            <TextView
+                android:text="Result"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:padding="8dp" />
+            <TextView
+                android:text="Action"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:padding="8dp" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="5/01/2025"
+                android:padding="8dp" />
+            <TextView
+                android:text="file1.png"
+                android:padding="8dp" />
+            <TextView
+                android:text="Hypodontia..."
+                android:padding="8dp" />
+            <Button
+                android:text="Delete"
+                android:backgroundTint="@color/primary_pink"
+                android:textColor="@color/black"
+                android:layout_margin="4dp"
+                android:padding="6dp" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:text="10/01/2025"
+                android:padding="8dp" />
+            <TextView
+                android:text="file2.png"
+                android:padding="8dp" />
+            <TextView
+                android:text="Dental Cari..."
+                android:padding="8dp" />
+            <Button
+                android:text="Delete"
+                android:backgroundTint="@color/primary_pink"
+                android:textColor="@color/black"
+                android:layout_margin="4dp"
+                android:padding="6dp" />
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

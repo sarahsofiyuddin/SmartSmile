@@ -33,6 +33,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.concurrent.TimeUnit;
 
@@ -126,13 +127,30 @@ public class  SignUpActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(this, "Registered successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(this, SignInActivity.class));
-                            finish();
+
+                            // ✅ Set the display name here
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(name)
+                                    .build();
+
+                            if (user != null) {
+                                user.updateProfile(profileUpdates)
+                                        .addOnCompleteListener(profileUpdateTask -> {
+                                            if (profileUpdateTask.isSuccessful()) {
+                                                Toast.makeText(this, "Registered successfully", Toast.LENGTH_SHORT).show();
+                                                startActivity(new Intent(this, SignInActivity.class));
+                                                finish();
+                                            } else {
+                                                Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+
                         } else {
                             Toast.makeText(this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
+
         });
 
         redirectText.setText(android.text.Html.fromHtml("Already have an account? <u>Sign In</u>"));
