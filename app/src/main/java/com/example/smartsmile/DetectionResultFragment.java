@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +26,17 @@ public class DetectionResultFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private static final String[] CLASS_NAMES = {
+            "Dental Calculus",
+            "Dental Caries",
+            "Gingivitis",
+            "Hypodontia"
+    };
+
+    private TextView textResult;
+    private TextView textConfidence;
+    private TextView textError;
 
     public DetectionResultFragment() {
         // Required empty public constructor
@@ -61,7 +73,52 @@ public class DetectionResultFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detection_result, container, false);
+        View view = inflater.inflate(R.layout.fragment_detection_result, container, false);
 
+        textResult = view.findViewById(R.id.text_result);
+        textConfidence = view.findViewById(R.id.text_confidence);
+        textError = view.findViewById(R.id.text_error);
+
+        displayResult();
+
+        return view;
     }
+
+    private void displayResult() {
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("inferenceResults")) {
+            float[] results = args.getFloatArray("inferenceResults");
+
+            if (results != null && results.length == CLASS_NAMES.length) {
+                int maxIndex = 0;
+                float maxValue = results[0];
+
+                for (int i = 1; i < results.length; i++) {
+                    if (results[i] > maxValue) {
+                        maxValue = results[i];
+                        maxIndex = i;
+                    }
+                }
+
+                String predictedClass = CLASS_NAMES[maxIndex];
+                float confidence = maxValue * 100;
+
+                textResult.setText("Predicted: " + predictedClass);
+                textConfidence.setText(String.format("Confidence: %.2f%%", confidence));
+                textError.setVisibility(View.GONE);
+            } else {
+                showError("Invalid model output.");
+            }
+        } else {
+            showError("Model failed to produce a result.");
+        }
+    }
+
+    private void showError(String message) {
+        textResult.setVisibility(View.GONE);
+        textConfidence.setVisibility(View.GONE);
+        textError.setVisibility(View.VISIBLE);
+        textError.setText("Error: " + message);
+    }
+
 }
