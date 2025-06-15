@@ -34,7 +34,10 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class  SignUpActivity extends AppCompatActivity {
@@ -128,7 +131,6 @@ public class  SignUpActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
 
-                            // ✅ Set the display name here
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(name)
                                     .build();
@@ -137,6 +139,7 @@ public class  SignUpActivity extends AppCompatActivity {
                                 user.updateProfile(profileUpdates)
                                         .addOnCompleteListener(profileUpdateTask -> {
                                             if (profileUpdateTask.isSuccessful()) {
+                                                saveUserToFirestore(user.getUid(), name, email, "email");
                                                 Toast.makeText(this, "Registered successfully", Toast.LENGTH_SHORT).show();
                                                 startActivity(new Intent(this, SignInActivity.class));
                                                 finish();
@@ -178,6 +181,23 @@ public class  SignUpActivity extends AppCompatActivity {
 
     }
 
+    private void saveUserToFirestore(String uid, String name, String email, String provider) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("name", name);
+        userMap.put("email", email);
+        userMap.put("provider", provider);
+        userMap.put("createdAt", System.currentTimeMillis());
+
+        db.collection("User").document(uid)
+                .set(userMap)
+                .addOnSuccessListener(aVoid ->
+                        Toast.makeText(SignUpActivity.this, "User profile saved", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e ->
+                        Toast.makeText(SignUpActivity.this, "Failed to save user profile", Toast.LENGTH_SHORT).show());
+    }
+
     private void signUpWithGoogle() {
         Intent signUpIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signUpIntent, RC_SIGN_UP);
@@ -205,6 +225,9 @@ public class  SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            saveUserToFirestore(user.getUid(), user.getDisplayName(), user.getEmail(), "google");
+                        }
                         Toast.makeText(SignUpActivity.this, "Welcome " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(SignUpActivity.this, MainActivity.class));
                         finish();
@@ -286,10 +309,14 @@ public class  SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = task.getResult().getUser();
+                        if (user != null) {
+                            saveUserToFirestore(user.getUid(), user.getPhoneNumber(), "", "phone");
+                        }
                         Toast.makeText(this, "Phone sign-up successful", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
-                    } else {
+                    }
+                    else {
                         Toast.makeText(this, "Phone sign-up failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });

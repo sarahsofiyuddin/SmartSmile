@@ -1,18 +1,31 @@
 package com.example.smartsmile;
 
-import android.content.Intent;
 import android.os.Bundle;
 
+import android.app.AlertDialog;
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,10 +42,17 @@ public class ProfileInfoFragment extends Fragment {
 
     private TextView textViewName, textViewEmail, textViewPhone;
     private CardView cardUpdatePassword, cardUpdateEmail, cardUpdatePhone, cardLogout;
+    private FirebaseAuth auth;
+    private String verificationId;
+    private PhoneAuthProvider.ForceResendingToken resendToken;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    public ProfileInfoFragment() {
+        // Required empty public constructor
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -50,10 +70,6 @@ public class ProfileInfoFragment extends Fragment {
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public ProfileInfoFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -80,6 +96,8 @@ public class ProfileInfoFragment extends Fragment {
         cardUpdatePhone = view.findViewById(R.id.cardUpdatePhone);
         cardLogout = view.findViewById(R.id.cardLogout);
 
+        auth = FirebaseAuth.getInstance();
+
         loadUserInfo();
         setupCardClickListeners();
 
@@ -100,27 +118,154 @@ public class ProfileInfoFragment extends Fragment {
             Toast.makeText(getContext(), "No user logged in", Toast.LENGTH_SHORT).show();
         }
     }
-
     private void setupCardClickListeners() {
         cardUpdatePassword.setOnClickListener(v ->
-                        Toast.makeText(getContext(), "Update Password clicked", Toast.LENGTH_SHORT).show()
-                // You can start a new fragment or activity here
-        );
+                showUpdateDialog("Password"));
 
         cardUpdateEmail.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Update Email clicked", Toast.LENGTH_SHORT).show()
-        );
+                showUpdateDialog("Email"));
 
         cardUpdatePhone.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Update Phone Number clicked", Toast.LENGTH_SHORT).show()
-        );
+                showPhoneDialog());
 
         cardLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-            // Optional: navigate back to login screen
-            startActivity(new Intent(getActivity(), SignInActivity.class));
-            getActivity().finish();
+            requireActivity().finish();
         });
+    }
+    private void showUpdateDialog(String type) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_update_info, null);
+        builder.setView(dialogView);
+
+        EditText editOld = dialogView.findViewById(R.id.editTextOldValue);
+        EditText editNew = dialogView.findViewById(R.id.editTextNewValue);
+        EditText editConfirm = dialogView.findViewById(R.id.editTextConfirmValue);
+        Button btnUpdate = dialogView.findViewById(R.id.buttonUpdate);
+
+        builder.setTitle(type.equals("password") ? "Update Password" : "Update Email");
+
+        AlertDialog dialog = builder.create();
+
+        btnUpdate.setOnClickListener(v -> {
+            String old = editOld.getText().toString().trim();
+            String newInfo = editNew.getText().toString().trim();
+            String confirm = editConfirm.getText().toString().trim();
+
+            if (old.isEmpty() || newInfo.isEmpty() || confirm.isEmpty()) {
+                Toast.makeText(getContext(), "All fields are required", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!newInfo.equals(confirm)) {
+                Toast.makeText(getContext(), "New and confirm do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null || user.getEmail() == null) {
+                Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Re-authenticate the user
+            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), old);
+            user.reauthenticate(credential).addOnSuccessListener(unused -> {
+                // Now safe to update email or password
+                if (type.equals("email")) {
+                    user.updateEmail(newInfo)
+                            .addOnSuccessListener(unused1 -> {
+                                Toast.makeText(getContext(), "Email updated", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                                loadUserInfo();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                } else {
+                    user.updatePassword(newInfo)
+                            .addOnSuccessListener(unused1 -> {
+                                Toast.makeText(getContext(), "Password updated", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            }).addOnFailureListener(e ->
+                    Toast.makeText(getContext(), "Re-authentication failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        });
+
+        dialog.show();
+    }
+
+    private void showPhoneDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_update_phone, null);
+        builder.setView(dialogView);
+
+        EditText editPhone = dialogView.findViewById(R.id.editTextNewPhone);
+        EditText editOTP = dialogView.findViewById(R.id.editTextOTP);
+        Button btnSendOTP = dialogView.findViewById(R.id.buttonSendOTP);
+        Button btnVerifyOTP = dialogView.findViewById(R.id.buttonVerifyOTP);
+
+        builder.setTitle("Update Phone Number");
+
+        AlertDialog dialog = builder.create();
+
+        btnSendOTP.setOnClickListener(v -> {
+            String phone = editPhone.getText().toString().trim();
+            if (TextUtils.isEmpty(phone)) {
+                Toast.makeText(getContext(), "Enter phone number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            PhoneAuthOptions options = PhoneAuthOptions.newBuilder(auth)
+                    .setPhoneNumber(phone)
+                    .setTimeout(60L, TimeUnit.SECONDS)
+                    .setActivity(requireActivity())
+                    .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                        @Override
+                        public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                            editOTP.setText(credential.getSmsCode());
+                        }
+
+                        @Override
+                        public void onVerificationFailed(@NonNull FirebaseException e) {
+                            Toast.makeText(getContext(), "Verification failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCodeSent(@NonNull String id,
+                                               @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                            verificationId = id;
+                            resendToken = token;
+                            Toast.makeText(getContext(), "OTP sent", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .build();
+            PhoneAuthProvider.verifyPhoneNumber(options);
+        });
+
+        btnVerifyOTP.setOnClickListener(v -> {
+            String otp = editOTP.getText().toString().trim();
+            if (TextUtils.isEmpty(otp)) {
+                Toast.makeText(getContext(), "Enter OTP", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, otp);
+            FirebaseUser user = auth.getCurrentUser();
+            if (user != null) {
+                user.updatePhoneNumber(credential)
+                        .addOnSuccessListener(unused -> {
+                            Toast.makeText(getContext(), "Phone number updated", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                            loadUserInfo();
+                        })
+                        .addOnFailureListener(e ->
+                                Toast.makeText(getContext(), "Failed to update phone: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        });
+
+        dialog.show();
     }
 }

@@ -3,29 +3,14 @@ package com.example.smartsmile;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DetectionResultFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DetectionResultFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private static final String[] CLASS_NAMES = {
             "Dental Calculus",
@@ -38,41 +23,20 @@ public class DetectionResultFragment extends Fragment {
     private TextView textConfidence;
     private TextView textError;
 
-    public DetectionResultFragment() {
-        // Required empty public constructor
-    }
+    public DetectionResultFragment() {}
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DetectionResultFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static DetectionResultFragment newInstance(String param1, String param2) {
         DetectionResultFragment fragment = new DetectionResultFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString("param1", param1);
+        args.putString("param2", param2);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_detection_result, container, false);
 
         textResult = view.findViewById(R.id.text_result);
@@ -87,25 +51,51 @@ public class DetectionResultFragment extends Fragment {
     private void displayResult() {
         Bundle args = getArguments();
         if (args != null && args.containsKey("inferenceResults")) {
-            float[] results = args.getFloatArray("inferenceResults");
+            float[] logits = args.getFloatArray("inferenceResults");
 
-            if (results != null && results.length == CLASS_NAMES.length) {
+            if (logits != null && logits.length == CLASS_NAMES.length) {
+
+                // Log raw output
+                for (int i = 0; i < logits.length; i++) {
+                    Log.d("DetectionResult", "Raw Logit [" + i + "] (" + CLASS_NAMES[i] + "): " + logits[i]);
+                }
+
+                // Apply softmax manually
+                float maxLogit = Float.NEGATIVE_INFINITY;
+                for (float logit : logits) {
+                    if (logit > maxLogit) maxLogit = logit;
+                }
+
+                float sum = 0f;
+                float[] probs = new float[logits.length];
+                for (int i = 0; i < logits.length; i++) {
+                    probs[i] = (float) Math.exp(logits[i] - maxLogit);
+                    sum += probs[i];
+                }
+
+                for (int i = 0; i < probs.length; i++) {
+                    probs[i] /= sum;
+                    Log.d("DetectionResult", "Softmax Prob [" + i + "] (" + CLASS_NAMES[i] + "): " + probs[i]);
+                }
+
+                // Get max prediction
                 int maxIndex = 0;
-                float maxValue = results[0];
-
-                for (int i = 1; i < results.length; i++) {
-                    if (results[i] > maxValue) {
-                        maxValue = results[i];
+                float maxProb = probs[0];
+                for (int i = 1; i < probs.length; i++) {
+                    if (probs[i] > maxProb) {
+                        maxProb = probs[i];
                         maxIndex = i;
                     }
                 }
 
                 String predictedClass = CLASS_NAMES[maxIndex];
-                float confidence = maxValue * 100;
+                float confidence = maxProb * 100;
 
                 textResult.setText("Predicted: " + predictedClass);
                 textConfidence.setText(String.format("Confidence: %.2f%%", confidence));
                 textError.setVisibility(View.GONE);
+
+                Log.d("DetectionResult", "Final prediction: " + predictedClass + " (" + confidence + "%)");
             } else {
                 showError("Invalid model output.");
             }
@@ -120,5 +110,4 @@ public class DetectionResultFragment extends Fragment {
         textError.setVisibility(View.VISIBLE);
         textError.setText("Error: " + message);
     }
-
 }
