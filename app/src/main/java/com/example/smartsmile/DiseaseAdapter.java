@@ -90,7 +90,7 @@ public class DiseaseAdapter extends RecyclerView.Adapter<DiseaseAdapter.DiseaseV
 
         public DiseaseViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewDisease = itemView.findViewById(R.id.text_disease);
+            textViewDisease = itemView.findViewById(R.id.textViewDiseaseTitle);
             viewPager = itemView.findViewById(R.id.viewPager);
         }
     }

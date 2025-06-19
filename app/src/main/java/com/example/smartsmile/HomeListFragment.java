@@ -75,10 +75,10 @@ public class HomeListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         List<DentalDisease> diseaseList = Arrays.asList(
-                new DentalDisease("Dental Caries", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon)),
-                new DentalDisease("Dental Calculus", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon)),
-                new DentalDisease("Gingivitis", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon)),
-                new DentalDisease("Hypodontia", Arrays.asList(R.drawable.phone_icon, R.drawable.home_icon, R.drawable.history_icon, R.drawable.password_icon, R.drawable.email_icon))
+                new DentalDisease("Dental Calculus", Arrays.asList(R.drawable.dental_calculus1, R.drawable.dental_calculus2, R.drawable.dental_calculus3, R.drawable.dental_calculus4, R.drawable.dental_calculus5)),
+                new DentalDisease("Dental Caries", Arrays.asList(R.drawable.dental_caries1, R.drawable.dental_caries2, R.drawable.dental_caries3, R.drawable.dental_caries4, R.drawable.dental_caries5)),
+                new DentalDisease("Hypodontia", Arrays.asList(R.drawable.hypodontia1, R.drawable.hypodontia2, R.drawable.hypodontia3, R.drawable.hypodontia4, R.drawable.hypodontia5)),
+                new DentalDisease("Gingivitis", Arrays.asList(R.drawable.gingivitis1, R.drawable.gingivitis2, R.drawable.gingivitis3, R.drawable.gingivitis4, R.drawable.gingivitis5))
         );
 
         recyclerView.setAdapter(new DiseaseAdapter(diseaseList, this));

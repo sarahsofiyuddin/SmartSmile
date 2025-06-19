@@ -1,5 +1,7 @@
 package com.example.smartsmile;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.app.AlertDialog;
@@ -13,9 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -24,6 +29,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import static android.app.Activity.RESULT_OK;
 
 import java.util.concurrent.TimeUnit;
 
@@ -40,11 +50,17 @@ public class ProfileInfoFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private static final int PICK_IMAGE_REQUEST = 1;
     private TextView textViewName, textViewEmail, textViewPhone;
     private CardView cardUpdatePassword, cardUpdateEmail, cardUpdatePhone, cardLogout;
+    private ImageButton buttonEditProfileImage;
+    private ShapeableImageView profileImageView;
     private FirebaseAuth auth;
+    private FirebaseFirestore firestore;
+    private StorageReference storageRef;
     private String verificationId;
     private PhoneAuthProvider.ForceResendingToken resendToken;
+    private Uri imageUri;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -90,6 +106,8 @@ public class ProfileInfoFragment extends Fragment {
         textViewName = view.findViewById(R.id.textViewName);
         textViewEmail = view.findViewById(R.id.textViewEmail);
         textViewPhone = view.findViewById(R.id.textViewPhone);
+        profileImageView = view.findViewById(R.id.profile_image);
+        buttonEditProfileImage = view.findViewById(R.id.buttonEditProfileImage);
 
         cardUpdatePassword = view.findViewById(R.id.cardUpdatePassword);
         cardUpdateEmail = view.findViewById(R.id.cardUpdateEmail);
@@ -97,15 +115,54 @@ public class ProfileInfoFragment extends Fragment {
         cardLogout = view.findViewById(R.id.cardLogout);
 
         auth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+        storageRef = FirebaseStorage.getInstance().getReference("profile_images");
 
         loadUserInfo();
         setupCardClickListeners();
 
+        buttonEditProfileImage.setOnClickListener(v -> openFileChooser());
+
         return view;
     }
-    private void loadUserInfo() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_PICK);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            profileImageView.setImageURI(imageUri);
+            uploadImageToFirebase();
+        }
+    }
+
+    private void uploadImageToFirebase() {
+        if (imageUri != null) {
+            String uid = auth.getCurrentUser().getUid();
+            StorageReference fileRef = storageRef.child(uid + ".jpg");
+
+            fileRef.putFile(imageUri).addOnSuccessListener(taskSnapshot ->
+                    fileRef.getDownloadUrl().addOnSuccessListener(uri ->
+                            firestore.collection("User").document(uid)
+                                    .update("profileImageUrl", uri.toString())
+                                    .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Profile image updated", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to save URL: " + e.getMessage(), Toast.LENGTH_SHORT).show())
+                    )
+            ).addOnFailureListener(e ->
+                    Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+            );
+        }
+    }
+
+    private void loadUserInfo() {
+        FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
             String name = user.getDisplayName();
             String email = user.getEmail();
@@ -114,6 +171,15 @@ public class ProfileInfoFragment extends Fragment {
             textViewName.setText(name != null ? name : "Name not set");
             textViewEmail.setText(email != null ? email : "Email not set");
             textViewPhone.setText(phone != null ? phone : "Phone not set");
+
+            firestore.collection("User").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    String imageUrl = documentSnapshot.getString("profileImageUrl");
+                    if (imageUrl != null && !imageUrl.isEmpty()) {
+                        Glide.with(this).load(imageUrl).into(profileImageView);
+                    }
+                }
+            });
         } else {
             Toast.makeText(getContext(), "No user logged in", Toast.LENGTH_SHORT).show();
         }
@@ -139,14 +205,32 @@ public class ProfileInfoFragment extends Fragment {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_update_info, null);
         builder.setView(dialogView);
 
+        TextView title = dialogView.findViewById(R.id.textViewTitle);
         EditText editOld = dialogView.findViewById(R.id.editTextOldValue);
         EditText editNew = dialogView.findViewById(R.id.editTextNewValue);
         EditText editConfirm = dialogView.findViewById(R.id.editTextConfirmValue);
         Button btnUpdate = dialogView.findViewById(R.id.buttonUpdate);
 
-        builder.setTitle(type.equals("password") ? "Update Password" : "Update Email");
+        if (type.equalsIgnoreCase("email")) {
+            title.setText("Update Email");
+            editOld.setHint("Enter old email");
+            editNew.setHint("Enter new email");
+            editConfirm.setHint("Confirm new email");
+            editOld.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+            editNew.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+            editConfirm.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        } else {
+            title.setText("Update Password");
+            editOld.setHint("Enter old password");
+            editNew.setHint("Enter new password");
+            editConfirm.setHint("Confirm new password");
+            editOld.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editNew.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editConfirm.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
 
         AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
         btnUpdate.setOnClickListener(v -> {
             String old = editOld.getText().toString().trim();
@@ -169,11 +253,9 @@ public class ProfileInfoFragment extends Fragment {
                 return;
             }
 
-            // Re-authenticate the user
             AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), old);
             user.reauthenticate(credential).addOnSuccessListener(unused -> {
-                // Now safe to update email or password
-                if (type.equals("email")) {
+                if (type.equalsIgnoreCase("email")) {
                     user.updateEmail(newInfo)
                             .addOnSuccessListener(unused1 -> {
                                 Toast.makeText(getContext(), "Email updated", Toast.LENGTH_SHORT).show();
@@ -207,8 +289,6 @@ public class ProfileInfoFragment extends Fragment {
         EditText editOTP = dialogView.findViewById(R.id.editTextOTP);
         Button btnSendOTP = dialogView.findViewById(R.id.buttonSendOTP);
         Button btnVerifyOTP = dialogView.findViewById(R.id.buttonVerifyOTP);
-
-        builder.setTitle("Update Phone Number");
 
         AlertDialog dialog = builder.create();
 

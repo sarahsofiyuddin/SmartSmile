@@ -2,8 +2,10 @@ package com.example.smartsmile;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -34,6 +37,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -164,7 +168,14 @@ public class  SignUpActivity extends AppCompatActivity {
         });
 
         googleSignUpButton = findViewById(R.id.google_signUp);
-        phoneButton = findViewById(R.id.signup_phone);
+
+        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.google_icon);
+        if (drawable != null) {
+            int iconSize = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+            drawable.setBounds(0, 0, iconSize, iconSize);
+            googleSignUpButton.setCompoundDrawables(drawable, null, null, null);
+        }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)) // From google-services.json
@@ -175,6 +186,8 @@ public class  SignUpActivity extends AppCompatActivity {
 
         // Handle Google Sign Up
         googleSignUpButton.setOnClickListener(v -> signUpWithGoogle());
+
+        phoneButton = findViewById(R.id.signup_phone);
 
         // Handle Phone Sign Up
         phoneButton.setOnClickListener(v -> showPhoneAuthDialog());
@@ -188,7 +201,7 @@ public class  SignUpActivity extends AppCompatActivity {
         userMap.put("name", name);
         userMap.put("email", email);
         userMap.put("provider", provider);
-        userMap.put("createdAt", System.currentTimeMillis());
+        userMap.put("createdAt", FieldValue.serverTimestamp());
 
         db.collection("User").document(uid)
                 .set(userMap)

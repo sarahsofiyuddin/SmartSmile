@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/white"
     android:padding="16dp">
 
+    <!-- Page Title -->
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/homeListTitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Is this the disease you are looking for?"
-        android:textSize="18sp"
-        android:layout_gravity="center"
-        android:paddingBottom="8dp"/>
+        android:text="Dental Disease Info"
+        android:layout_marginTop="16dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingBottom="12dp"
+        android:gravity="center"/>
 
+    <!-- RecyclerView for Disease List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingBottom="8dp"
         android:overScrollMode="never"
-        android:clipToPadding="false"
-        android:padding="10dp"/>
+        android:clipToPadding="false"/>
 </LinearLayout>

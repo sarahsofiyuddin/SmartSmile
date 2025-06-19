@@ -1,7 +1,9 @@
 package com.example.smartsmile;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +16,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -32,7 +35,13 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class SignInActivity extends AppCompatActivity {
@@ -81,8 +90,25 @@ public class SignInActivity extends AppCompatActivity {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
+                            String UserId = user.getUid();
+
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+                            DocumentReference userRef = db.collection("User").document(UserId);
+
+                            userRef.get().addOnSuccessListener(documentSnapshot -> {
+                                if (!documentSnapshot.exists()) {
+                                    Map<String, Object> userData = new HashMap<>();
+                                    userData.put("email", user.getEmail());
+                                    userData.put("name", user.getDisplayName()); // Optional
+                                    userData.put("phone", user.getPhoneNumber()); // Optional
+                                    userData.put("created_at", FieldValue.serverTimestamp());
+
+                                    userRef.set(userData, SetOptions.merge());
+                                }
+                            });
+
                             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(this, MainActivity.class)); // Redirect to main app
+                            startActivity(new Intent(this, MainActivity.class));
                             finish();
                         } else {
                             Toast.makeText(this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -138,6 +164,14 @@ public class SignInActivity extends AppCompatActivity {
         });
 
         googleSignInButton = findViewById(R.id.google_signIn);
+
+        Drawable drawable = ContextCompat.getDrawable(this, R.drawable.google_icon);
+        if (drawable != null) {
+            int iconSize = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
+            drawable.setBounds(0, 0, iconSize, iconSize);
+            googleSignInButton.setCompoundDrawables(drawable, null, null, null);
+        }
 
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -199,12 +233,26 @@ public class SignInActivity extends AppCompatActivity {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Sign in success
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(SignInActivity.this, "Welcome " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                        String UserId = user.getUid();
 
-                        // Navigate to home or dashboard activity
-                        startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        DocumentReference userRef = db.collection("User").document(UserId);
+
+                        userRef.get().addOnSuccessListener(documentSnapshot -> {
+                            if (!documentSnapshot.exists()) {
+                                Map<String, Object> userData = new HashMap<>();
+                                userData.put("email", user.getEmail());
+                                userData.put("name", user.getDisplayName()); // Optional
+                                userData.put("phone", user.getPhoneNumber()); // Optional
+                                userData.put("created_at", FieldValue.serverTimestamp());
+
+                                userRef.set(userData, SetOptions.merge());
+                            }
+                        });
+
+                        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(this, MainActivity.class));
                         finish();
                     } else {
                         Toast.makeText(SignInActivity.this, "Firebase Auth failed.", Toast.LENGTH_SHORT).show();
@@ -285,8 +333,25 @@ public class SignInActivity extends AppCompatActivity {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser user = task.getResult().getUser();
-                        Toast.makeText(this, "Phone login successful", Toast.LENGTH_SHORT).show();
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        String UserId = user.getUid();
+
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        DocumentReference userRef = db.collection("User").document(UserId);
+
+                        userRef.get().addOnSuccessListener(documentSnapshot -> {
+                            if (!documentSnapshot.exists()) {
+                                Map<String, Object> userData = new HashMap<>();
+                                userData.put("email", user.getEmail());
+                                userData.put("name", user.getDisplayName()); // Optional
+                                userData.put("phone", user.getPhoneNumber()); // Optional
+                                userData.put("created_at", FieldValue.serverTimestamp());
+
+                                userRef.set(userData, SetOptions.merge());
+                            }
+                        });
+
+                        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
                     } else {

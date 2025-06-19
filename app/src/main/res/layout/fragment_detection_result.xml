@@ -1,39 +1,58 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_result"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:padding="24dp">
 
+    <!-- Result Image -->
     <ImageView
         android:id="@+id/imageResult"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         android:scaleType="centerCrop"
-        android:layout_gravity="center"
-        android:layout_marginTop="100dp"
-        android:layout_marginBottom="50dp"
-        app:cardCornerRadius="20dp"
-        android:background="@color/secondary_pink"/>
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="24dp"
+        android:background="@color/secondary_pink" />
 
-    <TextView
-        android:id="@+id/text_result"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Predicted: -"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="12dp">
 
+        <ImageView
+            android:id="@+id/imageStatusIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/right_icon"
+            android:layout_marginEnd="12dp" />
+
+        <!-- Disease Class Name -->
+        <TextView
+            android:id="@+id/text_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" -"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#333333" />
+    </LinearLayout>
+
+    <!-- Dental Tips -->
     <TextView
-        android:id="@+id/text_confidence"
-        android:layout_width="wrap_content"
+        android:id="@+id/text_tips"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Confidence: -"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp" />
+        android:text="Recommendation Treatment: -"
+        android:textSize="16sp"
+        android:layout_marginTop="24dp"
+        android:textColor="#555555" />
 
+    <!-- Optional Error Message -->
     <TextView
         android:id="@+id/text_error"
         android:layout_width="wrap_content"
@@ -43,4 +62,5 @@
         android:textSize="16sp"
         android:visibility="gone"
         android:layout_marginTop="16dp" />
+
 </LinearLayout>

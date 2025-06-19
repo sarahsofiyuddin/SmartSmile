@@ -50,11 +50,11 @@
         <Button
             android:id="@+id/button_upload"
             android:layout_width="130dp"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_margin="10dp"
             app:cornerRadius = "20dp"
             android:backgroundTint="@color/primary_blue"
-            android:drawableLeft="@drawable/camera_icon"
+            android:drawableLeft="@drawable/gallery_icon"
             android:drawablePadding="8dp"
             android:padding="10dp"
             android:text="Gallery"

@@ -33,7 +33,7 @@
             android:layout_margin="10dp"
             app:cornerRadius = "20dp"
             android:backgroundTint="@color/primary_blue"
-            android:drawableLeft="@drawable/camera_icon"
+            android:drawableLeft="@drawable/submit_icon"
             android:drawablePadding="8dp"
             android:padding="10dp"
             android:textColor="@color/black"
