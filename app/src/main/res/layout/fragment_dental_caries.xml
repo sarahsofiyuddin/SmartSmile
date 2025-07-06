@@ -1,14 +1,80 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DentalCariesFragment">
+    android:background="@color/white"
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <ImageView
+            android:id="@+id/imageDentalCaries"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/dental_caries2" />
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dental Caries"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:id="@+id/textDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dental caries, commonly referred to as tooth decay or cavities, is a breakdown of the tooth structure caused by acids produced by bacteria. It typically starts as a small lesion and can progress deeper into the tooth if untreated, potentially causing pain and tooth loss."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="6dp" />
+
+        <TextView
+            android:id="@+id/textCausesHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="What Causes Dental Caries?"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_blue"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:id="@+id/textCauses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Frequent consumption of sugary foods and drinks\n• Inadequate brushing and flossing\n• Dry mouth or low saliva flow\n• Presence of plaque and bacteria\n• Poor dietary habits"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="6dp" />
+
+        <TextView
+            android:id="@+id/textHowItOccursHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="How Does It Form?"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_blue"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:id="@+id/textHowItOccurs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dental caries forms when oral bacteria break down sugars and produce acids that erode the tooth enamel. If left untreated, the decay can progress through the dentin to the inner pulp, causing infection or pain."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="6dp" />
+
+    </LinearLayout>
+</ScrollView>

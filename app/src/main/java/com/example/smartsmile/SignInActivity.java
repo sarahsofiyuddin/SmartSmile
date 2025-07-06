@@ -51,8 +51,8 @@ public class SignInActivity extends AppCompatActivity {
     private ImageView eyeIcon;
     Button googleSignInButton;
     private FirebaseAuth mAuth;
-    private static final int RC_SIGN_IN = 9001;
-    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 9001; // Google Sign In
+    private GoogleSignInClient mGoogleSignInClient; //Google authentication
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class SignInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
 
         // Set window insets for edge-to-edge support
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.signIn), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;

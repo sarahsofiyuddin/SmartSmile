@@ -63,7 +63,7 @@ public class DiseaseAdapter extends RecyclerView.Adapter<DiseaseAdapter.DiseaseV
                     targetFragment = new DentalCalculusFragment();
                     break;
                 case "Gingivitis":
-                    targetFragment = new DentalCalculusFragment();
+                    targetFragment = new GingivitisFragment();
                     break;
                 case "Hypodontia":
                     targetFragment = new HypodontiaFragment();
@@ -73,7 +73,7 @@ public class DiseaseAdapter extends RecyclerView.Adapter<DiseaseAdapter.DiseaseV
             }
 
             FragmentTransaction transaction = parentFragment.getParentFragmentManager().beginTransaction();
-            transaction.replace(R.id.frameLayout_home, targetFragment);
+            transaction.replace(R.id.frameLayout_info, targetFragment);
             transaction.addToBackStack(null);
             transaction.commit();
         });

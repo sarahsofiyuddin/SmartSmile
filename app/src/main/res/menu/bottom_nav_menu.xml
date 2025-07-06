@@ -7,6 +7,11 @@
         android:title="Home"/>
 
     <item
+        android:id="@+id/nav_info"
+        android:icon="@drawable/info_icon"
+        android:title="Info"/>
+
+    <item
         android:id="@+id/nav_detection"
         android:icon="@drawable/scan_icon"
         android:title="Scan"/>

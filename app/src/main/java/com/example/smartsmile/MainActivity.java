@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Set default fragment to DetectionFragment
         if (savedInstanceState == null) {
-            loadFragment(new DetectionFragment(), false);
-            bottomNavigationView.setSelectedItemId(R.id.nav_detection); // Set default selected item
+            loadFragment(new HomeFragment(), false);
+            bottomNavigationView.setSelectedItemId(R.id.nav_home); // Set default selected item
         }
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
                 if(itemId == R.id.nav_home){
                     loadFragment(new HomeFragment(), false);
+
+                } else if (itemId == R.id.nav_info){
+                    loadFragment(new InfoFragment(), false);
 
                 } else if (itemId == R.id.nav_detection){
                     loadFragment(new DetectionFragment(), false);

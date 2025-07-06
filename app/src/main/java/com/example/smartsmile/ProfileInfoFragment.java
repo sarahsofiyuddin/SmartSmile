@@ -197,7 +197,12 @@ public class ProfileInfoFragment extends Fragment {
         cardLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
-            requireActivity().finish();
+
+            Intent intent = new Intent(getActivity(), SignInActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
+            startActivity(intent);
+
+            requireActivity().finish(); // Finish current activity to prevent back navigation
         });
     }
     private void showUpdateDialog(String type) {

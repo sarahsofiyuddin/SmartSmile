@@ -5,15 +5,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
-    android:padding="16dp">
+    android:padding="20dp">
 
     <!-- Page Title -->
     <TextView
-        android:id="@+id/homeListTitle"
+        android:id="@+id/InfoListTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Dental Disease Info"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/black"

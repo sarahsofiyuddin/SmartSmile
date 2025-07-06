@@ -1,6 +1,5 @@
 package com.example.smartsmile;
 
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -15,28 +14,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.support.common.ops.NormalizeOp;
-import org.tensorflow.lite.support.image.ImageProcessor;
-import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.support.image.ops.ResizeOp;
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
-
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 
 public class DetectionPreviewFragment extends Fragment {
 
     private static final String TAG = "DetectionPreviewFragment";
 
-    private Interpreter tflite;
     private ImageView imageView;
     private Button buttonSubmit, buttonReupload;
     private Uri imageUri;
+    private Bitmap selectedBitmap;
 
     private static final int IMG_SIZE = 224;
     private static final int NUM_CLASSES = 4;
@@ -58,24 +47,9 @@ public class DetectionPreviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Load model
-        try {
-            tflite = new Interpreter(loadModelFile());
-            Log.d(TAG, "TFLite model loaded successfully.");
-        } catch (IOException e) {
-            Log.e(TAG, "Error loading TFLite model", e);
-        }
-
         if (getArguments() != null && getArguments().containsKey("imageUri")) {
             imageUri = getArguments().getParcelable("imageUri");
         }
-    }
-
-    private MappedByteBuffer loadModelFile() throws IOException {
-        AssetFileDescriptor fileDescriptor = getContext().getAssets().openFd("model_resnet.tflite");
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, fileDescriptor.getStartOffset(), fileDescriptor.getDeclaredLength());
     }
 
     @Override
@@ -88,6 +62,12 @@ public class DetectionPreviewFragment extends Fragment {
 
         if (imageUri != null) {
             imageView.setImageURI(imageUri);
+            try {
+                InputStream imageStream = getContext().getContentResolver().openInputStream(imageUri);
+                selectedBitmap = BitmapFactory.decodeStream(imageStream);
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Failed to load image.", Toast.LENGTH_SHORT).show();
+            }
         }
 
         buttonSubmit.setOnClickListener(v -> runModelAndShowResult());
@@ -97,52 +77,42 @@ public class DetectionPreviewFragment extends Fragment {
     }
 
     private void runModelAndShowResult() {
-        float[] results = runInference(imageUri);
-        if (results == null) return;
-
-        DetectionResultFragment resultFragment = new DetectionResultFragment();
-        Bundle bundle = new Bundle();
-        bundle.putFloatArray("inferenceResults", results);
-        bundle.putString("imageUri", imageUri.toString());
-        resultFragment.setArguments(bundle);
-
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.frameLayout_detection, resultFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-    private float[] runInference(Uri imageUri) {
-        try {
-            InputStream imageStream = getContext().getContentResolver().openInputStream(imageUri);
-            Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
-
-            TensorImage tensorImage = new TensorImage();
-            tensorImage.load(bitmap);
-
-            ImageProcessor imageProcessor = new ImageProcessor.Builder()
-                    .add(new ResizeOp(IMG_SIZE, IMG_SIZE, ResizeOp.ResizeMethod.BILINEAR))
-                    .add(new NormalizeOp(127.5f, 127.5f)) // Normalize to [-1, 1]
-                    .build();
-
-            tensorImage = imageProcessor.process(tensorImage);
-
-            TensorBuffer outputBuffer = TensorBuffer.createFixedSize(new int[]{1, NUM_CLASSES}, org.tensorflow.lite.DataType.FLOAT32);
-
-            tflite.run(tensorImage.getBuffer(), outputBuffer.getBuffer());
-
-            return outputBuffer.getFloatArray();
-        } catch (Exception e) {
-            Log.e(TAG, "Error during inference", e);
-            return null;
+        if (selectedBitmap == null) {
+            Toast.makeText(getContext(), "Please upload or capture an image.", Toast.LENGTH_SHORT).show();
+            return;
         }
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (tflite != null) {
-            tflite.close();
+        try {
+            DentalDiseaseClassifier classifier = new DentalDiseaseClassifier(getContext());
+
+            // Early check: is image blank or unclear?
+            if (classifier.classify(selectedBitmap).equals("ERROR_BLANK_IMAGE")) {
+                Toast.makeText(getContext(), "The image is too dark or unclear. Please reupload or recapture.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            // Now get class probabilities
+            float[] probs = classifier.getClassProbabilities(selectedBitmap);
+            if (probs == null) {
+                Toast.makeText(getContext(), "Model failed to analyze image. Please try again.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Navigate to result fragment
+            DetectionResultFragment resultFragment = new DetectionResultFragment();
+            Bundle bundle = new Bundle();
+            bundle.putFloatArray("inferenceResults", probs);
+            bundle.putString("imageUri", imageUri.toString());
+            resultFragment.setArguments(bundle);
+
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.frameLayout_detection, resultFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Model error", e);
+            Toast.makeText(getContext(), "An error occurred while analyzing the image.", Toast.LENGTH_SHORT).show();
         }
     }
 }

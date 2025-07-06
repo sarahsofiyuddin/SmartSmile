@@ -7,10 +7,10 @@
     android:layout_marginVertical="8dp"
     android:layout_marginHorizontal="4dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="8dp"
-    app:strokeColor="@color/primary_blue"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/primary_pink"
     app:strokeWidth="1dp"
-    android:backgroundTint="@color/secondary_blue">
+    android:backgroundTint="@color/secondary_pink">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:paddingStart="10dp"
             android:overScrollMode="never"
             android:background="@drawable/dialog_background"
-            android:backgroundTint="@color/secondary_blue"
+            android:backgroundTint="@color/secondary_pink"
             android:layout_marginBottom="10dp"/>
 
         <TextView

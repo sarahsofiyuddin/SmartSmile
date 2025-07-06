@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/dialog_background"
+    android:backgroundTint="@color/secondary_blue">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Update Information"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:id="@+id/editTextOldValue"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Enter old value"
+        android:background="@drawable/signuplogin_edittext"
+        android:padding="10dp"
+        android:drawableLeft="@drawable/password_icon"
+        android:drawablePadding="10dp"
+        android:layout_marginTop="16dp"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/editTextNewValue"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Enter new value"
+        android:background="@drawable/signuplogin_edittext"
+        android:padding="10dp"
+        android:drawableLeft="@drawable/password_icon"
+        android:drawablePadding="10dp"
+        android:layout_marginTop="12dp"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/editTextConfirmValue"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Confirm new value"
+        android:background="@drawable/signuplogin_edittext"
+        android:padding="10dp"
+        android:drawableLeft="@drawable/password_icon"
+        android:drawablePadding="10dp"
+        android:layout_marginTop="12dp"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/buttonUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Update"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/primary_blue"
+        app:cornerRadius="20dp" />
+</LinearLayout>

@@ -1,14 +1,80 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HypodontiaFragment">
+    android:background="@color/white"
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <ImageView
+            android:id="@+id/imageHypodontia"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/hypodontia1" />
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hypodontia"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:id="@+id/textDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hypodontia is a developmental condition where one or more teeth fail to develop. It commonly affects permanent teeth and may cause functional and aesthetic concerns. The condition may be hereditary and is often diagnosed during childhood."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="6dp" />
+
+        <TextView
+            android:id="@+id/textCausesHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="What Causes Hypodontia?"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_blue"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:id="@+id/textCauses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Genetic factors and family history\n• Congenital syndromes (e.g. ectodermal dysplasia)\n• Environmental factors during tooth development\n• Certain infections or trauma during early childhood\n• Nutritional deficiencies"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="6dp" />
+
+        <TextView
+            android:id="@+id/textHowItOccursHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="How Does It Form?"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_blue"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:id="@+id/textHowItOccurs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hypodontia occurs when the tooth germ fails to form during development, resulting in the absence of one or more permanent teeth. It often becomes noticeable when primary teeth do not fall out or permanent teeth fail to erupt."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="6dp" />
+
+    </LinearLayout>
+</ScrollView>
