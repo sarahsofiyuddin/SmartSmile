@@ -154,10 +154,6 @@ public class DetectionResultFragment extends Fragment {
                 .setCancelable(false)
                 .create();
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-
         String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
         com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
         com.google.firebase.storage.FirebaseStorage storage = com.google.firebase.storage.FirebaseStorage.getInstance();
@@ -173,7 +169,17 @@ public class DetectionResultFragment extends Fragment {
                 .addOnSuccessListener(querySnapshot -> {
                     for (com.google.firebase.firestore.DocumentSnapshot doc : querySnapshot) {
                         String name = doc.getString("name");
-                        String age = doc.getString("age");
+
+                        Object ageObj = doc.get("age");
+                        String age;
+                        if (ageObj instanceof Number) {
+                            age = String.valueOf(((Number) ageObj).intValue());
+                        } else if (ageObj instanceof String) {
+                            age = (String) ageObj;
+                        } else {
+                            age = "Unknown";
+                        }
+
                         if (name != null) {
                             childNames.add(name);
                             if (age != null) {
@@ -215,7 +221,7 @@ public class DetectionResultFragment extends Fragment {
 
             Map<String, Object> childData = new HashMap<>();
             childData.put("name", childName);
-            childData.put("age", childAge);
+            childData.put("age", age);
 
             db.collection("User").document(uid)
                     .collection("Child").document(childName)

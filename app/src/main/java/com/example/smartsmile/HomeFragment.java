@@ -2,12 +2,17 @@ package com.example.smartsmile;
 
 import android.os.Bundle;
 
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -97,7 +102,34 @@ public class HomeFragment extends Fragment {
             String uid = mAuth.getCurrentUser().getUid();
             loadScanData(uid);
             loadTotalChildren(uid, view);
-            loadTotalScansAndLastDetection(uid, view);
+            RecyclerView recyclerView = view.findViewById(R.id.recyclerChildren);
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+            loadChildrenList(uid, recyclerView);
+
+            SwitchCompat switchGraph = view.findViewById(R.id.switchGraph);
+            TextView toggleLabel = view.findViewById(R.id.toggleLabel);
+            ImageView toggleIcon = view.findViewById(R.id.toggleIcon);
+            LineChart lineChart = view.findViewById(R.id.lineChartScans);
+            LinearLayout simpleListContainer = view.findViewById(R.id.simpleListContainer);
+
+            switchGraph.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    toggleLabel.setText("Graph");
+                    toggleIcon.setImageResource(R.drawable.graph_icon);
+                    lineChart.setVisibility(View.VISIBLE);
+                    simpleListContainer.setVisibility(View.GONE);
+                    lineChart.setVisibility(View.VISIBLE);
+                    simpleListContainer.setVisibility(View.GONE);
+                } else {
+                    toggleLabel.setText("List");
+                    toggleIcon.setImageResource(R.drawable.list_icon);
+                    lineChart.setVisibility(View.GONE);
+                    simpleListContainer.setVisibility(View.VISIBLE);
+                    lineChart.setVisibility(View.GONE);
+                    simpleListContainer.setVisibility(View.VISIBLE);
+                    loadSimpleScanSummary(uid, simpleListContainer);
+                }
+            });
         }
 
         return view;
@@ -113,27 +145,31 @@ public class HomeFragment extends Fragment {
                 });
     }
 
-    private void loadTotalScansAndLastDetection(String uid, View view) {
-        db.collection("User").document(uid).collection("Detection")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+    private void loadChildrenList(String uid, RecyclerView recyclerView) {
+        db.collection("User").document(uid).collection("Child")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int totalScans = queryDocumentSnapshots.size();
-                    TextView totalScansView = view.findViewById(R.id.textTotalScans);
-                    totalScansView.setText(String.valueOf(totalScans));
+                    List<Child> childList = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        String name = doc.getString("name");
+                        int age = 0;
+                        Object ageObj = doc.get("age");
 
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot latest = queryDocumentSnapshots.getDocuments().get(0);
-                        String prediction = latest.getString("prediction");
-                        String treatment = latest.getString("treatment");
+                        if (ageObj instanceof Number) {
+                            age = ((Number) ageObj).intValue();
+                        } else if (ageObj instanceof String) {
+                            try {
+                                age = Integer.parseInt((String) ageObj);
+                            } catch (NumberFormatException ignored) {}
+                        }
 
-                        TextView lastDiseaseView = view.findViewById(R.id.textLastScanDisease);
-                        TextView lastTreatmentView = view.findViewById(R.id.textLastScanTreatment);
-
-                        lastDiseaseView.setText("Last Detected: " + (prediction != null ? prediction : "-"));
-                        lastTreatmentView.setText("Recommended Treatment: " + (treatment != null ? treatment : "-"));
+                        childList.add(new Child(name, age));
                     }
-                });
+
+                    ChildAdapter adapter = new ChildAdapter(requireContext(), childList);
+                    recyclerView.setAdapter(adapter);
+                })
+                .addOnFailureListener(Throwable::printStackTrace);
     }
 
     private void loadScanData(String uid) {
@@ -153,6 +189,12 @@ public class HomeFragment extends Fragment {
                             int count = dateCountMap.getOrDefault(dateStr, 0);
                             dateCountMap.put(dateStr, count + 1);
                         }
+                    }
+
+                    int totalScans = queryDocumentSnapshots.size();
+                    TextView totalScansView = getView().findViewById(R.id.textTotalScans);
+                    if (totalScansView != null) {
+                        totalScansView.setText(" " + totalScans);
                     }
 
                     List<Entry> entries = new ArrayList<>();
@@ -177,29 +219,48 @@ public class HomeFragment extends Fragment {
                         }
                     });
 
-
                     LineData lineData = new LineData(dataSet);
                     lineChart.setData(lineData);
 
+                    lineChart.setVisibleXRangeMaximum(5); // Show 5 data points at once
+                    lineChart.moveViewToX(entries.size()); // Move view to latest
+
+                    CustomMarkerView markerView = new CustomMarkerView(requireContext(), xLabels);
+                    markerView.setChartView(lineChart);
+                    lineChart.setMarker(markerView);
+
+                    lineChart.getDescription().setEnabled(false);
+                    lineChart.animateX(1000);
+                    lineChart.invalidate();
+
+                    // Enable full zooming & panning
+                    lineChart.setTouchEnabled(true);
+                    lineChart.setDragEnabled(true);
+                    lineChart.setScaleEnabled(true);           // Enable zooming on both axes
+                    lineChart.setScaleXEnabled(true);
+                    lineChart.setScaleYEnabled(true);
+                    lineChart.setPinchZoom(true);              // Enable pinch to zoom
+                    lineChart.setDoubleTapToZoomEnabled(true); // Optional: double-tap zoom
+
+                    // X-Axis (labels)
                     XAxis xAxis = lineChart.getXAxis();
                     xAxis.setGranularity(1f);
+                    xAxis.setLabelCount(xLabels.size(), true);
                     xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
                     xAxis.setValueFormatter(new ValueFormatter() {
                         @Override
                         public String getFormattedValue(float value) {
-                            int index = Math.round(value);
-                            if (index >= 0 && index < xLabels.size()) {
-                                return xLabels.get(index);
-                            } else {
-                                return "";
-                            }
+                            int idx = Math.round(value);
+                            return (idx >= 0 && idx < xLabels.size()) ? xLabels.get(idx) : "";
                         }
                     });
                     xAxis.setDrawGridLines(true);
                     xAxis.setGridColor(ContextCompat.getColor(requireContext(), R.color.primary_pink));
                     xAxis.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
+
+                    // Y-Axis Left
                     YAxis yAxisLeft = lineChart.getAxisLeft();
-                    yAxisLeft.setGranularity(1f); // Steps of 1
+                    yAxisLeft.setGranularity(1f);
                     yAxisLeft.setValueFormatter(new ValueFormatter() {
                         @Override
                         public String getFormattedValue(float value) {
@@ -210,17 +271,57 @@ public class HomeFragment extends Fragment {
                     yAxisLeft.setGridColor(ContextCompat.getColor(requireContext(), R.color.primary_pink));
                     yAxisLeft.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
 
-                    YAxis yAxisRight = lineChart.getAxisRight();
-                    yAxisRight.setEnabled(false);
+                    // Disable right Y-axis
+                    lineChart.getAxisRight().setEnabled(false);
 
+                    // Chart appearance
                     lineChart.getDescription().setEnabled(false);
                     lineChart.getLegend().setEnabled(false);
-                    lineChart.animateX(1000);
-                    lineChart.invalidate();
+
+                    // Animate chart on entry
+                    lineChart.animateX(1000);  // animate left to right
+                    lineChart.animateY(1000);  // animate bottom to top
+
+                    lineChart.setData(lineData);
+                    lineChart.invalidate(); // Refresh chart
                 })
-                .addOnFailureListener(e -> {
-                    // Handle error
-                    e.printStackTrace();
-                });
+                .addOnFailureListener(Throwable::printStackTrace);
     }
+
+    private void loadSimpleScanSummary(String uid, LinearLayout container) {
+        db.collection("User")
+                .document(uid)
+                .collection("Detection")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(querySnapshots -> {
+                    Map<String, Integer> scanCounts = new LinkedHashMap<>();
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+                    for (DocumentSnapshot doc : querySnapshots) {
+                        Timestamp timestamp = doc.getTimestamp("timestamp");
+                        if (timestamp != null) {
+                            String dateStr = sdf.format(timestamp.toDate());
+                            scanCounts.put(dateStr, scanCounts.getOrDefault(dateStr, 0) + 1);
+                        }
+                    }
+
+                    container.removeAllViews(); // Clear previous items
+
+                    for (Map.Entry<String, Integer> entry : scanCounts.entrySet()) {
+                        View itemView = LayoutInflater.from(getContext())
+                                .inflate(R.layout.item_scan_summary, container, false);
+
+                        TextView dateText = itemView.findViewById(R.id.textScanDate);
+                        TextView countText = itemView.findViewById(R.id.textScanCount);
+
+                        dateText.setText("Date: " + entry.getKey());
+                        countText.setText("Total Scans: " + entry.getValue());
+
+                        container.addView(itemView);
+                    }
+                })
+                .addOnFailureListener(Throwable::printStackTrace);
+    }
+
 }

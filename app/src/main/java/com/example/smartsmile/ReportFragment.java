@@ -160,6 +160,10 @@ public class ReportFragment extends Fragment {
                 .setView(dialogView)
                 .create();
 
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
         Button btnCancel = dialogView.findViewById(R.id.buttonCancelDelete);
         Button btnConfirm = dialogView.findViewById(R.id.buttonConfirmDelete);
 
