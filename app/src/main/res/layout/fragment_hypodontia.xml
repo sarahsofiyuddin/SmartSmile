@@ -2,12 +2,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:padding="16dp">
+    android:padding="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Hypodontia"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp"/>
 
         <ImageView
             android:id="@+id/imageHypodontia"
@@ -17,16 +29,6 @@
             android:src="@drawable/hypodontia1" />
 
         <TextView
-            android:id="@+id/textTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hypodontia"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginTop="16dp" />
-
-        <TextView
             android:id="@+id/textDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,14 +36,15 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:layout_marginTop="12dp"
-            android:lineSpacingExtra="6dp" />
+            android:lineSpacingExtra="6dp"
+            android:justificationMode="inter_word"/>
 
         <TextView
             android:id="@+id/textCausesHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="What Causes Hypodontia?"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/primary_blue"
             android:layout_marginTop="24dp" />
@@ -54,14 +57,15 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:layout_marginTop="8dp"
-            android:lineSpacingExtra="6dp" />
+            android:lineSpacingExtra="6dp"
+            android:justificationMode="inter_word"/>
 
         <TextView
             android:id="@+id/textHowItOccursHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="How Does It Form?"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/primary_blue"
             android:layout_marginTop="24dp" />
@@ -74,7 +78,8 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:layout_marginTop="8dp"
-            android:lineSpacingExtra="6dp" />
+            android:lineSpacingExtra="6dp"
+            android:justificationMode="inter_word"/>
 
     </LinearLayout>
 </ScrollView>

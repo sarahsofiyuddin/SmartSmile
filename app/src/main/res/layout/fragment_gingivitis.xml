@@ -2,12 +2,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:padding="16dp">
+    android:padding="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Gingivitis"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp"/>
 
         <ImageView
             android:id="@+id/imageGingivitis"
@@ -17,16 +29,6 @@
             android:src="@drawable/gingivitis1" />
 
         <TextView
-            android:id="@+id/textTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gingivitis"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:layout_marginTop="16dp" />
-
-        <TextView
             android:id="@+id/textDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,7 +36,8 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:layout_marginTop="12dp"
-            android:lineSpacingExtra="6dp" />
+            android:lineSpacingExtra="6dp"
+            android:justificationMode="inter_word"/>
 
         <TextView
             android:id="@+id/textCausesHeader"
@@ -54,7 +57,8 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:layout_marginTop="8dp"
-            android:lineSpacingExtra="6dp" />
+            android:lineSpacingExtra="6dp"
+            android:justificationMode="inter_word"/>
 
         <TextView
             android:id="@+id/textHowItOccursHeader"
@@ -74,7 +78,8 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:layout_marginTop="8dp"
-            android:lineSpacingExtra="6dp" />
+            android:lineSpacingExtra="6dp"
+            android:justificationMode="inter_word"/>
 
     </LinearLayout>
 </ScrollView>

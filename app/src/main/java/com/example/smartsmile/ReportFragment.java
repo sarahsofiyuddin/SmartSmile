@@ -170,6 +170,20 @@ public class ReportFragment extends Fragment {
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         btnConfirm.setOnClickListener(v -> {
+            String imageUrl = doc.getString("imageUrl");
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                com.google.firebase.storage.FirebaseStorage.getInstance()
+                        .getReferenceFromUrl(imageUrl)
+                        .delete()
+                        .addOnSuccessListener(aVoid -> {
+                            // Image deleted successfully
+                        })
+                        .addOnFailureListener(e -> {
+                            // Failed to delete image
+                            android.util.Log.e("StorageDelete", "Image deletion failed", e);
+                        });
+            }
+
             doc.getReference().delete()
                     .addOnSuccessListener(unused -> {
                         db.collection("User").document(uid)

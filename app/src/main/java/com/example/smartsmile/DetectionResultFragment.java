@@ -153,6 +153,9 @@ public class DetectionResultFragment extends Fragment {
                 .setView(dialogView)
                 .setCancelable(false)
                 .create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
 
         String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
         com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();

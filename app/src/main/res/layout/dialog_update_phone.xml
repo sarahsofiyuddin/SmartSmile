@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="@drawable/dialog_background"
+    android:backgroundTint="@color/secondary_blue">
 
     <TextView
         android:id="@+id/textViewTitle"
@@ -34,7 +36,7 @@
         android:layout_height="wrap_content"
         android:text="Send OTP"
         android:layout_marginTop="10dp"
-        android:backgroundTint="@color/secondary_blue"
+        android:backgroundTint="@color/primary_blue"
         android:textColor="@color/black"
         app:cornerRadius="20dp" />
 

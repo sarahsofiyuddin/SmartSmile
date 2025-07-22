@@ -1,6 +1,7 @@
 package com.example.smartsmile;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -35,6 +36,7 @@ import com.google.firebase.storage.StorageReference;
 
 import static android.app.Activity.RESULT_OK;
 
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,6 +52,7 @@ public class ProfileInfoFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private static final int CAMERA_REQUEST_CODE = 2;
     private static final int PICK_IMAGE_REQUEST = 1;
     private TextView textViewName, textViewEmail, textViewPhone;
     private CardView cardUpdatePassword, cardUpdateEmail, cardUpdatePhone, cardLogout;
@@ -121,32 +124,102 @@ public class ProfileInfoFragment extends Fragment {
         loadUserInfo();
         setupCardClickListeners();
 
-        buttonEditProfileImage.setOnClickListener(v -> openFileChooser());
+        buttonEditProfileImage.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_profile_image, null);
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent); // Optional for rounded bg
+
+// Get references to buttons
+            Button buttonChooseGallery = dialogView.findViewById(R.id.buttonChooseGallery);
+            Button buttonTakePhoto = dialogView.findViewById(R.id.buttonTakePhoto);
+            Button buttonRemovePhoto = dialogView.findViewById(R.id.buttonRemovePhoto);
+
+// Set click listeners
+            buttonChooseGallery.setOnClickListener(v1 -> {
+                openGallery();
+                dialog.dismiss();
+            });
+
+            buttonTakePhoto.setOnClickListener(v2 -> {
+                openCamera();
+                dialog.dismiss();
+            });
+
+            buttonRemovePhoto.setOnClickListener(v3 -> {
+                deleteProfileImage();
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        });
 
         return view;
     }
 
-    private void openFileChooser() {
-        Intent intent = new Intent();
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_PICK);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    private void openCamera() {
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAMERA_REQUEST_CODE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            profileImageView.setImageURI(imageUri);
-            uploadImageToFirebase();
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PICK_IMAGE_REQUEST && data != null && data.getData() != null) {
+                imageUri = data.getData();
+                profileImageView.setImageURI(imageUri);
+                uploadImageToFirebase();
+            } else if (requestCode == CAMERA_REQUEST_CODE && data != null && data.getExtras() != null) {
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                profileImageView.setImageBitmap(photo);
+
+                // Convert bitmap to URI
+                imageUri = getImageUri(photo);
+                uploadImageToFirebase();
+            }
         }
+    }
+
+    private Uri getImageUri(Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = android.provider.MediaStore.Images.Media.insertImage(
+                requireContext().getContentResolver(), bitmap, "ProfileImage", null);
+        return Uri.parse(path);
+    }
+
+    private void deleteProfileImage() {
+        String uid = auth.getCurrentUser().getUid();
+        storageRef = FirebaseStorage.getInstance().getReference("profile_images");
+        StorageReference fileRef = storageRef.child(uid + "/profile.jpg");
+
+        fileRef.delete().addOnSuccessListener(aVoid -> {
+            firestore.collection("User").document(uid)
+                    .update("profileImageUrl", "")
+                    .addOnSuccessListener(unused -> {
+                        profileImageView.setImageResource(R.drawable.profile_icon);
+                        Toast.makeText(getContext(), "Profile image removed", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(getContext(), "Failed to update Firestore: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        }).addOnFailureListener(e ->
+                Toast.makeText(getContext(), "Failed to delete image: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void uploadImageToFirebase() {
         if (imageUri != null) {
             String uid = auth.getCurrentUser().getUid();
-            StorageReference fileRef = storageRef.child(uid + ".jpg");
+            storageRef = FirebaseStorage.getInstance().getReference("profile_images");
+            StorageReference fileRef = storageRef.child(uid + "/profile.jpg");
 
             fileRef.putFile(imageUri).addOnSuccessListener(taskSnapshot ->
                     fileRef.getDownloadUrl().addOnSuccessListener(uri ->
@@ -176,7 +249,11 @@ public class ProfileInfoFragment extends Fragment {
                 if (documentSnapshot.exists()) {
                     String imageUrl = documentSnapshot.getString("profileImageUrl");
                     if (imageUrl != null && !imageUrl.isEmpty()) {
+                        profileImageView.setVisibility(View.VISIBLE);
                         Glide.with(this).load(imageUrl).into(profileImageView);
+                    } else {
+                        profileImageView.setImageResource(R.drawable.profile_icon);
+                        profileImageView.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -184,6 +261,7 @@ public class ProfileInfoFragment extends Fragment {
             Toast.makeText(getContext(), "No user logged in", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void setupCardClickListeners() {
         cardUpdatePassword.setOnClickListener(v ->
                 showUpdateDialog("Password"));
@@ -229,9 +307,9 @@ public class ProfileInfoFragment extends Fragment {
             editOld.setHint("Enter old password");
             editNew.setHint("Enter new password");
             editConfirm.setHint("Confirm new password");
-            editOld.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            editNew.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            editConfirm.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editOld.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editNew.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            editConfirm.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
 
         AlertDialog dialog = builder.create();
