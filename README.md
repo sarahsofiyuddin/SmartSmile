@@ -1,57 +1,82 @@
-# Common Dental Disease Detection & Management Among Children using Deep Learning
+# 🦷 SmartSmile: Dental Disease Detection & Management App
 
-A mobile application that uses deep learning to detect and manage common dental diseases in children from images captured via the device camera or uploaded from the gallery. The application helps parents or guardians receive early detection and management advice based on AI-powered analysis.
+SmartSmile is a mobile application that leverages deep learning to detect and manage common dental diseases among children. By analysing images captured via the device camera or uploaded from the gallery, the application provides early detection and basic management guidance for parents and guardians.
 
-## 📱 Features
-- Detect common dental diseases using a trained CNN (ResNet-based) model.
-- Supports image capture and upload.
-- Shows disease name and treatment recommendations.
-- Stores child profiles and scan history.
-- Filter detection reports by child name.
-- Firebase integration for:
-  - Authentication
-  - Cloud Firestore (child profiles, detection records)
-  - Firebase Storage (image uploads)
-- User-friendly dashboard with scan statistics and charts.
+---
+
+## 📱 Key Features
+- Detects common dental diseases using a trained deep learning model
+- Supports real-time image capture and gallery upload
+- Displays predicted disease along with treatment recommendations
+- Manages child profiles and stores scan history
+- Allows filtering of detection reports by child profile
+- Interactive dashboard with scan statistics and visual insights
+
+---
 
 ## 🧠 Model Development
-- Trained on a custom dental image dataset.
-- Compared six models:
+- Developed using a custom dental image dataset
+- Evaluated multiple models:
   - CNN, RNN, DBN
   - ResNet, Inception, DenseNet (CNN variants)
-- ResNet-based CNN selected for final deployment due to highest accuracy and robustness.
-- Converted to TensorFlow Lite (.tflite) for on-device inference.
+- ResNet-based CNN selected due to superior performance and robustness
+- Model converted to **TensorFlow Lite (TFLite)** for efficient on-device inference
+
+🔗 **View Training Notebook (Google Colab):**  
+https://colab.research.google.com/drive/1RuOPZkYy9ts3pffwSEeYUJXY1kvfSqiA?usp=sharing
+
+---
 
 ## 🛠️ Tech Stack
-- Language: Java & XML
-- IDE: Android Studio
-- Model Framework: TensorFlow Lite
-- Backend: Firebase Authentication, Firestore, Firebase Storage
+- **Mobile Development:** Java, XML (Android Studio)
+- **Machine Learning:** TensorFlow Lite
+- **Backend Services:**  
+  - Firebase Authentication  
+  - Cloud Firestore  
+  - Firebase Storage
+
+---
 
 ## 📊 Dashboard Overview
-- Total children profiles
-- Total scans conducted
-- Last detected condition & suggested treatment
-- Line chart of scan activity over time
+- Total number of registered child profiles
+- Total number of scans conducted
+- Latest detected condition with suggested treatment
+- Scan activity trends displayed using line charts
 
-## 🚀 How to Run
-1. Clone the repo
-2. Open with Android Studio
-3. Connect a device/emulator
-4. Replace Firebase config (google-services.json)
-5. Run the app
+---
+
+## 🚀 Getting Started
+1. Clone this repository  
+2. Open the project in Android Studio  
+3. Connect a physical device or emulator  
+4. Add your Firebase configuration file (`google-services.json`)  
+5. Build and run the application  
+
+---
 
 ## 🔐 Firebase Setup
-- Enable:
-  - Authentication (Email/Password)
-  - Firestore Database
-  - Firebase Storage
-- Set security rules to protect user-specific data
+Ensure the following services are enabled:
+- Authentication (Email/Password)
+- Cloud Firestore
+- Firebase Storage  
+
+Configure appropriate security rules to restrict access to user-specific data.
+
+---
+
+## 🎯 Project Highlights
+- End-to-end development: **data preprocessing → model training → mobile deployment**
+- Integration of AI model into a real-world Android application
+- Focus on usability for non-technical users (parents/guardians)
+
+---
 
 ## 👩‍💻 Developed By
-Sarah Syazana,
-Bachelor of Computer Science (Hons.),
+**Sarah Syazana**  
+Bachelor of Computer Science (Hons.), Big Data Analytics  
 Universiti Teknologi MARA (UiTM)
 
-## 📄 License
-This project is for academic and research purposes only. Not intended for clinical use.
+---
+
+## ⚠️ Disclaimer
+This application is developed for academic and research purposes only and is not intended for clinical diagnosis or professional medical use.
