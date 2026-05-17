@@ -2,16 +2,14 @@
 
 SmartSmile is a mobile application that leverages deep learning to detect and manage common dental diseases among children. By analysing images captured via the device camera or uploaded from the gallery, the application provides early detection and basic management guidance for parents and guardians.
 
+---
+
 ## 🖼️ Project Poster
 
 <p align="center">
   <a href="https://drive.google.com/file/d/1sTxQIizPlaudjEkkccWw7f_55l7HTu5Y/view?usp=sharing" target="_blank">
     <img src="https://drive.google.com/uc?id=1sTxQIizPlaudjEkkccWw7f_55l7HTu5Y" alt="SmartSmile Poster" width="700"/>
   </a>
-</p>
-
-<p align="center">
-  <i>Click the poster to view full size</i>
 </p>
 
 ---
