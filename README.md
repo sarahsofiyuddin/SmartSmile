@@ -4,6 +4,11 @@ SmartSmile is a mobile application that leverages deep learning to detect and ma
 
 ---
 
+## 🌐 **Live Demo (Try App in Browser)**
+https://appetize.io/app/b_7cruiidxejayy4usizrjnihf5u
+
+---
+
 ## 🖼️ Project Poster
 
 https://drive.google.com/file/d/1sTxQIizPlaudjEkkccWw7f_55l7HTu5Y/view?usp=sharing
